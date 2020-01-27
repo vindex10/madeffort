@@ -23,7 +23,7 @@ function make_dirs () {
     echo "$path"
     path_dir="$(dirname "$path")"
     mkdir -p "$path_dir"
-    subdirs=$(find "$path_dir" -type d)
+    subdirs=$(find "$OUTPUT_DIR" -type d)
     for subdir in $subdirs; do
         touch "$subdir/__init__.py"
     done
@@ -35,6 +35,8 @@ function build_matrix () {
         key="${matrix_f#$MAD_OUTPUT/}"
 
         m_target="$OUTPUT_DIR/${key%.f}.so"
+        m_mname="${key##*/}"
+        m_mname="${m_mname%.*}"
         m_fname=$(cat "$matrix_f" | grep -m1 "SUBROUTINE" | sed 's/SUBROUTINE//' | sed 's/([^)]\+)//' | sed 's/[[:blank:]]//g' | awk '{ print tolower($0) }')
         m_sources="$MADEFFORT_DIR/src/matrix/matrix.cpp"
 
@@ -42,7 +44,8 @@ function build_matrix () {
 
         subprocess_dir="$(echo $matrix_f | grep -o -E 'SubProcesses/P[^/]+/')"
         subprocess_dir="$MAD_OUTPUT/$subprocess_dir"
-        TARGET="$m_target" FNAME="$m_fname" SOURCES="$m_sources" make -C "$subprocess_dir" -f "$MADEFFORT_DIR/src/matrix/Makefile" "$m_target"
+
+        TARGET="$m_target" MNAME="$m_mname" FNAME="$m_fname" SOURCES="$m_sources" make -C "$subprocess_dir" -f "$MADEFFORT_DIR/src/matrix/Makefile" "$m_target"
     done
 }
 

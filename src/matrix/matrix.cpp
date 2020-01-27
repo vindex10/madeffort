@@ -38,6 +38,6 @@ py::array_t<double> FNAME(py::array_t<double, py::array::c_style | py::array::fo
     return res;
 }
 
-PYBIND11_MODULE(FNAME, m) {
+PYBIND11_MODULE(MNAME, m) {
     m.def(PYFNAME, &FNAME);
 }
